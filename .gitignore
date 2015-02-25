@@ -5,3 +5,4 @@ testdata
 .manifest
 *.swp
 test_scratch
+!**/stripe-internal/sequins
