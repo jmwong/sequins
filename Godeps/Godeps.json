@@ -47,21 +47,6 @@
 			"Rev": "f3960ab1f9664ecc4e27c78af27cc9063d745a43"
 		},
 		{
-			"ImportPath": "github.com/stripe/sequins/backend",
-			"Comment": "v0.4.7-6-g88155af",
-			"Rev": "88155af9cfe2244ce6dacf4d4c18c963ea861c8f"
-		},
-		{
-			"ImportPath": "github.com/stripe/sequins/index",
-			"Comment": "v0.4.7-6-g88155af",
-			"Rev": "88155af9cfe2244ce6dacf4d4c18c963ea861c8f"
-		},
-		{
-			"ImportPath": "github.com/stripe/sequins/sequencefile",
-			"Comment": "v0.4.7-6-g88155af",
-			"Rev": "88155af9cfe2244ce6dacf4d4c18c963ea861c8f"
-		},
-		{
 			"ImportPath": "github.com/syndtr/goleveldb/leveldb",
 			"Rev": "4875955338b0a434238a31165cb87255ab6e9e4a"
 		},
