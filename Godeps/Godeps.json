@@ -1,0 +1,78 @@
+{
+	"ImportPath": "github.com/stripe-internal/sequins",
+	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./...",
+		"."
+	],
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/goprotobuf/proto",
+			"Comment": "go.r60-163",
+			"Rev": "9352842ae63ee1d7e74e074ce7bb10370c4b6b9e"
+		},
+		{
+			"ImportPath": "github.com/NYTimes/gziphandler",
+			"Rev": "9939d5d76991602af6af2efb8a5eac70426c6eb7"
+		},
+		{
+			"ImportPath": "github.com/alecthomas/template",
+			"Rev": "b867cc6ab45cece8143cfcc6fc9c77cf3f2c23c0"
+		},
+		{
+			"ImportPath": "github.com/alecthomas/units",
+			"Rev": "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
+		},
+		{
+			"ImportPath": "github.com/colinmarc/hdfs",
+			"Comment": "v0.1.4-3-gb522594",
+			"Rev": "b522594b2813eaa205ab6353f76b9d4976284e59"
+		},
+		{
+			"ImportPath": "github.com/crowdmob/goamz/aws",
+			"Rev": "3a06871fe9fc0281ca90f3a7d97258d042ed64c0"
+		},
+		{
+			"ImportPath": "github.com/crowdmob/goamz/s3",
+			"Rev": "3a06871fe9fc0281ca90f3a7d97258d042ed64c0"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.0-51-gf3960ab",
+			"Rev": "f3960ab1f9664ecc4e27c78af27cc9063d745a43"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/require",
+			"Comment": "v1.0-51-gf3960ab",
+			"Rev": "f3960ab1f9664ecc4e27c78af27cc9063d745a43"
+		},
+		{
+			"ImportPath": "github.com/stripe/sequins/backend",
+			"Comment": "v0.4.7-6-g88155af",
+			"Rev": "88155af9cfe2244ce6dacf4d4c18c963ea861c8f"
+		},
+		{
+			"ImportPath": "github.com/stripe/sequins/index",
+			"Comment": "v0.4.7-6-g88155af",
+			"Rev": "88155af9cfe2244ce6dacf4d4c18c963ea861c8f"
+		},
+		{
+			"ImportPath": "github.com/stripe/sequins/sequencefile",
+			"Comment": "v0.4.7-6-g88155af",
+			"Rev": "88155af9cfe2244ce6dacf4d4c18c963ea861c8f"
+		},
+		{
+			"ImportPath": "github.com/syndtr/goleveldb/leveldb",
+			"Rev": "4875955338b0a434238a31165cb87255ab6e9e4a"
+		},
+		{
+			"ImportPath": "github.com/syndtr/gosnappy/snappy",
+			"Rev": "156a073208e131d7d2e212cb749feae7c339e846"
+		},
+		{
+			"ImportPath": "gopkg.in/alecthomas/kingpin.v2",
+			"Comment": "v2.1.2",
+			"Rev": "ad3f502db8f0ebd60d920400a16eabdfb7908964"
+		}
+	]
+}
