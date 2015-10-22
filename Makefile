@@ -1,23 +1,24 @@
-TRAVIS_TAG ?= $(shell git rev-parse HEAD)
-ARCH = $(shell go env GOOS)-$(shell go env GOARCH)
-RELEASE_NAME = sequins-$(TRAVIS_TAG)-$(ARCH)
+TRAVIS_TAG ?= HEAD
+SEQUINS_VERSION ?= $(TRAVIS_TAG)-$(shell go env GOOS)-$(shell go env GOARCH)
+RELEASE_NAME = sequins-$(SEQUINS_VERSION)
 
-all: sequins sequins-dump
+all: sequins
+
+vendor: get-deps godep
+	godep save ./... .
+
+godep:
+	go get github.com/tools/godep
 
 sequins: get-deps
-	go build -x -ldflags "-X main.version=$(TRAVIS_TAG)"
-
-sequins-dump:
-	go build -x -ldflags "-X main.version=$(TRAVIS_TAG)"  ./cmd/sequins-dump
+	go build
 
 install: get-deps
 	go install
 
-release: sequins sequins-dump
-	./sequins --version
-	./sequins-dump --version
+release: sequins
 	mkdir -p $(RELEASE_NAME)
-	cp sequins sequins-dump README.md LICENSE.txt $(RELEASE_NAME)/
+	cp sequins README.md LICENSE.txt $(RELEASE_NAME)/
 	tar -cvzf $(RELEASE_NAME).tar.gz $(RELEASE_NAME)
 
 test: get-deps
@@ -33,7 +34,7 @@ get-deps:
 	go get github.com/NYTimes/gziphandler
 
 clean:
-	rm -f sequins sequins-dump sequins-*.tar.gz
+	rm -f sequins sequins-*.tar.gz
 	rm -rf $(RELEASE_NAME)
 
 .PHONY: install release test get-deps

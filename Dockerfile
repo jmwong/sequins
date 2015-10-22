@@ -1,9 +1,18 @@
-FROM golang:1.3
-MAINTAINER Colin Marc <colinmarc@gmail.com>
+# Ubuntu 12.04
+FROM dockerregistry.service.consul/stripe/ubuntu-12.04
 
-ADD . /go/src/github.com/colinmarc/sequins
-RUN cd /go/src/github.com/colinmarc/sequins && make install
+RUN apt-get update && apt-get install -y tree cowsay coreutils wget curl git mercurial build-essential
 
-CMD ["--bind", ":9599", "/go/src/github.com/colinmarc/sequins/test_data"]
-ENTRYPOINT ["/go/bin/sequins"]
-EXPOSE 9599
+# Go 1.4.2
+RUN curl --silent --location https://golang.org/dl/go1.4.2.linux-amd64.tar.gz > /tmp/go.tar.gz
+ADD go.tar.gz.sha512 /tmp/go.tar.gz.sha512
+RUN shasum -p -a 512 -c /tmp/go.tar.gz.sha512
+RUN tar --directory=/usr/local/ -xzf /tmp/go.tar.gz
+ENV PATH $PATH:/usr/local/go/bin
+
+# Test & Build
+RUN mkdir -p /sequins
+RUN mkdir -p /build
+ADD . /sequins
+WORKDIR /sequins
+CMD /sequins/test_and_build.sh
