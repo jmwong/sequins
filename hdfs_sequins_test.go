@@ -5,7 +5,7 @@ import (
 	"github.com/colinmarc/hdfs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/stripe/sequins/backend"
+	"github.com/stripe-internal/sequins/backend"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"

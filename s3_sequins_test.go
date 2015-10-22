@@ -7,7 +7,7 @@ import (
 	"github.com/crowdmob/goamz/s3/s3test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/stripe/sequins/backend"
+	"github.com/stripe-internal/sequins/backend"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"

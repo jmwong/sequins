@@ -15,8 +15,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stripe/sequins/backend"
-	"github.com/stripe/sequins/index"
+	"github.com/stripe-internal/sequins/backend"
+	"github.com/stripe-internal/sequins/index"
 )
 
 type sequinsOptions struct {

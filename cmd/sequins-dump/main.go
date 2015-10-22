@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/stripe/sequins/sequencefile"
+	"github.com/stripe-internal/sequins/sequencefile"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 

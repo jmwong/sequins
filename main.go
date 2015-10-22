@@ -14,7 +14,7 @@ import (
 	"github.com/colinmarc/hdfs"
 	"github.com/crowdmob/goamz/aws"
 	"github.com/crowdmob/goamz/s3"
-	"github.com/stripe/sequins/backend"
+	"github.com/stripe-internal/sequins/backend"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 

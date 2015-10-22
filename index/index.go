@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/stripe/sequins/sequencefile"
+	"github.com/stripe-internal/sequins/sequencefile"
 	"github.com/syndtr/goleveldb/leveldb"
 	"io"
 	"io/ioutil"

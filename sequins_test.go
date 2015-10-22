@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/stripe/sequins/backend"
+	"github.com/stripe-internal/sequins/backend"
 	"io"
 	"io/ioutil"
 	"net/http"
