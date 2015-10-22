@@ -111,9 +111,19 @@ func (s *S3Backend) Download(version string, destPath string) error {
 				continue
 			}
 
-			err = s.downloadFile(key.Key, filepath.Join(destPath, name))
-			if err != nil {
-				return err
+			// Try to download the file three times.
+			attempts := 3
+			for i := 1; i <= attempts; i++ {
+				err = s.downloadFile(key.Key, filepath.Join(destPath, name))
+				if err != nil {
+					if i == attempts {
+						return err
+					} else {
+						log.Printf("Error downloading %s (attempt %d): %s", key.Key, i, err)
+					}
+				} else {
+					break
+				}
 			}
 		}
 
@@ -140,6 +150,13 @@ func (s *S3Backend) downloadFile(src string, dest string) error {
 	}
 
 	defer reader.Close()
+
+	if _, err = os.Stat(dest); err == nil {
+		log.Printf("%s already exists. Deleting it.", dest)
+		if err = os.Remove(dest); err != nil {
+			return err
+		}
+	}
 
 	localFile, err := os.Create(dest)
 	if err != nil {
