@@ -93,6 +93,8 @@ func (s *S3Backend) LatestVersion(checkForSuccess bool) (string, error) {
 func (s *S3Backend) Download(version string, destPath string) error {
 	versionPrefix := path.Join(s.path, version)
 
+	log.Printf("Downloading %s with retries.", versionPrefix)
+
 	// we'll assume large-ish files, and only download one at a time
 	marker := ""
 	for {
