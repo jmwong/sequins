@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -ex
+
+svc -t /etc/service/$HENSON_SERVICE
