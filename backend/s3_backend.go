@@ -6,18 +6,22 @@ import (
 	"path"
 	"strings"
 
-	"github.com/crowdmob/goamz/s3"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 type S3Backend struct {
-	bucket *s3.Bucket
+	bucket string
 	path   string
+	svc    *s3.S3
 }
 
-func NewS3Backend(bucket *s3.Bucket, s3path string) *S3Backend {
+func NewS3Backend(bucket string, s3path string, sess *session.Session) *S3Backend {
 	return &S3Backend{
 		bucket: bucket,
 		path:   strings.TrimPrefix(path.Clean(s3path), "/"),
+		svc:    s3.New(sess),
 	}
 }
 
@@ -29,7 +33,14 @@ func (s *S3Backend) LatestVersion(checkForSuccess bool) (string, error) {
 	var version, marker string
 
 	for {
-		resp, err := s.bucket.List(s.path+"/", "/", marker, 1000)
+		params := &s3.ListObjectsInput{
+			Bucket:		aws.String(s.bucket),
+			Delimiter:	aws.String("/"),
+			Marker:		aws.String(marker),
+			MaxKeys:	aws.Int64(1000),
+			Prefix:		aws.String(s.path+"/"),
+		}
+		resp, err := s.svc.ListObjects(params)
 
 		if err != nil {
 			return "", s.s3error(err)
@@ -40,7 +51,7 @@ func (s *S3Backend) LatestVersion(checkForSuccess bool) (string, error) {
 		var prefix string
 		// Search backwards for a valid version
 		for i := len(resp.CommonPrefixes) - 1; i >= 0; i-- {
-			prefix = strings.TrimSuffix(resp.CommonPrefixes[i], "/")
+			prefix = strings.TrimSuffix(resp.CommonPrefixes[i].String(), "/")
 			if path.Base(prefix) <= version {
 				continue
 			}
@@ -50,18 +61,19 @@ func (s *S3Backend) LatestVersion(checkForSuccess bool) (string, error) {
 				// If the 'directory' has a key _SUCCESS inside it, that implies that
 				// there might be other keys with the same prefix
 				successFile := path.Join(prefix, "_SUCCESS")
-				exists, err := s.bucket.Exists(successFile)
+				exists, err := s.exists(successFile)
+
 				if err != nil {
-					return "", s.s3error(err)
+					return "", err
 				}
 
 				valid = exists
 			} else {
 				// Otherwise, we just check the prefix itself. If it doesn't exist, then
 				// it's a prefix for some other key, and we can call it a directory
-				exists, err := s.bucket.Exists(prefix)
+				exists, err := s.exists(prefix)
 				if err != nil {
-					return "", s.s3error(err)
+					return "", err
 				}
 
 				valid = !exists
@@ -72,10 +84,10 @@ func (s *S3Backend) LatestVersion(checkForSuccess bool) (string, error) {
 			}
 		}
 
-		if !resp.IsTruncated {
+		if !*resp.IsTruncated {
 			break
 		} else {
-			marker = resp.CommonPrefixes[len(resp.CommonPrefixes)-1]
+			marker = resp.CommonPrefixes[len(resp.CommonPrefixes)-1].String()
 		}
 	}
 
@@ -93,7 +105,15 @@ func (s *S3Backend) ListFiles(version string) ([]string, error) {
 	res := make([]string, 0)
 
 	for {
-		resp, err := s.bucket.List(versionPrefix, "", marker, 1000)
+		params := &s3.ListObjectsInput{
+			Bucket:		aws.String(s.bucket),
+			Delimiter:	aws.String(""),
+			Marker:		aws.String(marker),
+			MaxKeys:	aws.Int64(1000),
+			Prefix:		aws.String(versionPrefix),
+		}
+		resp, err := s.svc.ListObjects(params)
+
 		if err != nil {
 			return nil, s.s3error(err)
 		} else if resp.Contents == nil || len(resp.Contents) == 0 {
@@ -101,15 +121,15 @@ func (s *S3Backend) ListFiles(version string) ([]string, error) {
 		}
 
 		for _, key := range resp.Contents {
-			name := path.Base(key.Key)
+			name := path.Base(*key.Key)
 			// S3 sometimes has keys that are the same as the "directory"
 			if strings.TrimSpace(name) != "" && !strings.HasPrefix(name, "_") && !strings.HasPrefix(name, ".") {
 				res = append(res, name)
 			}
 		}
 
-		if resp.IsTruncated {
-			marker = resp.CommonPrefixes[len(resp.CommonPrefixes)-1]
+		if *resp.IsTruncated {
+			marker = resp.CommonPrefixes[len(resp.CommonPrefixes)-1].String()
 		} else {
 			break
 		}
@@ -120,12 +140,17 @@ func (s *S3Backend) ListFiles(version string) ([]string, error) {
 
 func (s *S3Backend) Open(version, file string) (io.ReadCloser, error) {
 	src := path.Join(s.path, version, file)
-	reader, err := s.bucket.GetReader(src)
+	params := &s3.GetObjectInput{
+		Bucket:                     aws.String(s.bucket),
+		Key:                        aws.String(src),
+	}
+	resp, err := s.svc.GetObject(params)
+
 	if err != nil {
 		return nil, fmt.Errorf("Error opening S3 path %s: %s", s.path, err)
 	}
 
-	return reader, nil
+	return resp.Body, nil
 }
 
 func (s *S3Backend) DisplayPath(version string) string {
@@ -134,10 +159,27 @@ func (s *S3Backend) DisplayPath(version string) string {
 
 func (s *S3Backend) displayURL(pathElements ...string) string {
 	key := strings.TrimPrefix(path.Join(pathElements...), "/")
-	return fmt.Sprintf("s3://%s/%s", s.bucket.Name, key)
+	return fmt.Sprintf("s3://%s/%s", s.bucket, key)
 }
 
-// goamz error messages are always unqualified
+func (s *S3Backend) exists(key string) (bool, error) {
+	params := &s3.GetObjectInput{
+		Bucket:                     aws.String(s.bucket),
+		Key:                        aws.String(key),
+	}
+	resp, err := s.svc.GetObject(params)
+
+	if err != nil {
+		return false, s.s3error(err)
+	}
+
+	if *resp.ContentLength > int64(0) {
+		return true, err
+	}
+	// TODO: will false always be attached to an err?
+	return false, err
+}
+
 func (s *S3Backend) s3error(err error) error {
-	return fmt.Errorf("Unexpected S3 error on bucket %s: %s", s.bucket.Name, err)
+	return fmt.Errorf("Unexpected S3 error on bucket %s: %s", s.bucket, err)
 }

@@ -118,25 +118,25 @@ func (s *sequins) refresh() error {
 	s.reloadLock.Lock()
 	defer s.reloadLock.Unlock()
 
-	lasestVersion, err := s.backend.LatestVersion(s.config.RequireSuccessFile)
+	latestVersion, err := s.backend.LatestVersion(s.config.RequireSuccessFile)
 	if err != nil {
 		return err
 	}
 
 	currentVersion := s.mux.getCurrent()
 	s.mux.release(currentVersion)
-	if currentVersion != nil && lasestVersion == currentVersion.name {
+	if currentVersion != nil && latestVersion == currentVersion.name {
 		// TODO: we log this a bunch uneccessarily.
-		log.Printf("%s is already the newest version, so not reloading.", lasestVersion)
+		log.Printf("%s is already the newest version, so not reloading.", latestVersion)
 		return nil
 	}
 
-	files, err := s.backend.ListFiles(lasestVersion)
+	files, err := s.backend.ListFiles(latestVersion)
 	if err != nil {
 		return err
 	}
 
-	builder := newVersion(lasestVersion, len(files), s.peers, s.zkWatcher)
+	builder := newVersion(latestVersion, len(files), s.peers, s.zkWatcher)
 	vs, err := builder.build(s.backend, s.config.LocalStore)
 	if err != nil {
 		return err
