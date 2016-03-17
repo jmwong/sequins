@@ -47,7 +47,7 @@ func (r *Reader) ReadHeader() error {
 		return err
 	}
 
-	if keyClassName != "org.apache.hadoop.io.BytesWritable" {
+	if keyClassName != "org.apache.hadoop.io.BytesWritable" && keyClassName != "org.apache.hadoop.io.LongWritable" {
 		return fmt.Errorf("Unsupported key serialization: %s", keyClassName)
 	}
 
